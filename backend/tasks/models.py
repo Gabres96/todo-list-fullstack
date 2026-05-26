@@ -27,9 +27,14 @@ class Task(models.Model):
         blank=True,
         related_name='tasks'
     )
+    
+    shared_with = models.ManyToManyField(
+        User, 
+        blank=True, 
+        related_name='shared_tasks'
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
