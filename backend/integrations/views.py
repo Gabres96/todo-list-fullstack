@@ -4,29 +4,42 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-class DailyAdviceView(APIView):
+from .services import WeatherService
+
+class WeatherAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        url = "https://api.adviceslip.com/advice"
+        
+        city_name = request.query_params.get('city', 'Brasil')
         
         try:
-            response = requests.get(url, timeout=5)
+            response = WeatherService.get_current_weather(city_name=city_name)
             
             if response.status_code == 200:
                 data = response.json()
-                advice = data.get('slip', {}).get('advice', 'Erro: Resposta da API externa veio vazia ou em formato inesperado.')
+                results = data.get("results", {})
+                
+                weather_data = {
+                    "temp": results.get("temp"),
+                    "description": results.get("description"),
+                    "currently": results.get("currently"),
+                    "city": results.get("city"),
+                    "humidity": results.get("humidity"),
+                    "wind_speedy": results.get("wind_speedy")
+                }
                 
                 return Response({
                     "status": "success",
-                    "integration": "Advice Slip API",
-                    "advice": advice
+                    "integration": "HG Brasil Weather API",
+                    "weather": weather_data
                 }, status=status.HTTP_200_OK)
                 
             return Response({
                 "status": "error",
                 "message": f"A API externa retornou um erro HTTP. Código de status: {response.status_code}."
             }, status=status.HTTP_502_BAD_GATEWAY)
+
         except requests.exceptions.Timeout:
             return Response({
                 "status": "error",
@@ -36,7 +49,7 @@ class DailyAdviceView(APIView):
         except requests.exceptions.ConnectionError:
             return Response({
                 "status": "error",
-                "message": "Erro de Conexão: Não foi possível estabelecer comunicação com o servidor da API externa. Verifique a internet ou o endereço da URL."
+                "message": "Erro de Conexão: Não foi possível estabelecer comunicação com o servidor da API externa. Verifique a internet."
             }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             
         except requests.exceptions.RequestException as e:
