@@ -28,9 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function signIn(username: string, pass: string) {
     try {
-      const response = await api.post('/token/', { username, password: pass });
-      
-     
+      const response = await api.post('/users/token/', { username, password: pass });
+    
       const { access, user: userData } = response.data;
 
       localStorage.setItem('@TodoApp:token', access);
