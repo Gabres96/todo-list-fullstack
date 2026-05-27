@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Task
 from .serializers import TaskSerializer
@@ -9,23 +10,14 @@ from .serializers import TaskSerializer
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['completed', 'category']
 
     def get_queryset(self):
-        queryset = Task.objects.filter(
-            Q(owner=self.request.user) | Q(shared_with=self.request.user)).distinct()
-
-        completed = self.request.query_params.get('completed')
-
-        if completed is not None:
-            queryset = queryset.filter(
-                completed=completed.lower() == 'true'
-            )
-            
-        category_id = self.request.query_params.get('category')
-        if category_id is not None:
-            queryset = queryset.filter(category_id=category_id)
-
-        return queryset
+        return Task.objects.filter(
+            Q(owner=self.request.user) | Q(shared_with=self.request.user)
+        ).distinct().order_by('-created_at')
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

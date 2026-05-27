@@ -48,4 +48,4 @@ def test_user_cannot_see_other_users_tasks(authenticated_client):
     response = authenticated_client.get(reverse('tasks-list'))
     
     assert response.status_code == status.HTTP_200_OK
-    assert not any(task['title'] == "Tarefa Secreta" for task in response.data)
+    assert not any(task['title'] == "Tarefa Secreta" for task in response.data['results'])
