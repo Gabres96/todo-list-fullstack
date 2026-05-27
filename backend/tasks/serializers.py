@@ -10,7 +10,7 @@ class UserMinifiedSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     
-    shared_with_detaisl = UserMinifiedSerializer(source='shared_with', many=True, read_only=True)
+    shared_with_details = UserMinifiedSerializer(source='shared_with', many=True, read_only=True)
 
     class Meta:
         model = Task
