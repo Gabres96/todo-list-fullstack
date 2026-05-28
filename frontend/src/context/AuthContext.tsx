@@ -29,18 +29,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   async function signIn(username: string, pass: string) {
     try {
       const response = await api.post('/users/token/', { username, password: pass });
-    
-      const { access, user: userData } = response.data;
-
+      const { access } = response.data;
+      const fakeUser = {
+        id: 0,
+        username,
+        email: '',
+      };
+      
       localStorage.setItem('@TodoApp:token', access);
-      localStorage.setItem('@TodoApp:user', JSON.stringify(userData || { username }));
+      localStorage.setItem('@TodoApp:user', JSON.stringify(fakeUser));
 
-      setUser(userData || { id: 0, username, email: '' });
+      setUser(fakeUser);
     } catch (error) {
       console.error('Erro no login:', error);
       throw new Error('Usuário ou senha inválidos');
     }
-  }
+  }  
 
   function signOut() {
     localStorage.removeItem('@TodoApp:token');
