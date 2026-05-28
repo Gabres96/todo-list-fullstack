@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-
 from .models import Task
-
 
 class UserMinifiedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,6 +9,7 @@ class UserMinifiedSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    owner_username = serializers.ReadOnlyField(source='owner.username')
 
     shared_with_details = UserMinifiedSerializer(
         source='shared_with',
@@ -20,7 +19,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = '__all__' 
 
         read_only_fields = (
             'owner',

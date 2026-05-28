@@ -19,24 +19,17 @@ export const taskService = {
         const response = await api.get('/tasks/', {
             params: filters,
         });
-
         return response.data;
-
     },
 
     async createTask(data: Partial<Task>): Promise<Task> {
         const response = await api.post('/tasks/', data);
-
-
         return response.data;
-
     },
 
     async updateTask(id: number, data: Partial<Task>): Promise<Task> {
         const response = await api.put(`/tasks/${id}/`, data);
-
         return response.data;
-
     },
 
     async deleteTask(id: number): Promise<void> {
@@ -47,8 +40,13 @@ export const taskService = {
         const response = await api.patch(`/tasks/${task.id}/`, {
             completed: !task.completed,
         });
-
         return response.data;
+    },
 
+    async shareTask(id: number, username: string): Promise<Task> {
+        const response = await api.post(`/tasks/${id}/share/`, {
+            username,
+        });
+        return response.data;
     },
 };
