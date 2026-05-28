@@ -20,7 +20,7 @@ interface TaskFilters {
 
 export const Dashboard: React.FC = () => {
 
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
 
     const [tasks, setTasks] = useState<Task[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -201,7 +201,46 @@ export const Dashboard: React.FC = () => {
                     padding: '2rem',
                 }}
             >
-                <h1>Olá, {user?.username}</h1>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    backgroundColor: '#fff',
+                    padding: '1rem 1.5rem',
+                    borderRadius: '8px',
+                    marginBottom: '2rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    border: '1px solid #e0e0e0'
+                }}>
+                    <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#333' }}>
+                        Olá, <span style={{ color: '#007bff' }}>@{user?.username}</span> 👋
+                    </h2>
+                    
+                    <button
+                        onClick={logout}
+                        style={{
+                            padding: '0.5rem 1.2rem',
+                            backgroundColor: '#fff',
+                            color: '#dc3545',
+                            border: '1px solid #dc3545',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.9rem',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={(e) => {
+                            e.currentTarget.style.backgroundColor = '#dc3545';
+                            e.currentTarget.style.color = '#fff';
+                        }}
+                        onMouseOut={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fff';
+                            e.currentTarget.style.color = '#dc3545';
+                        }}
+                    >
+                        Sair da Conta
+                    </button>
+                </div>
 
                 {weather && (
                     <div
@@ -210,11 +249,13 @@ export const Dashboard: React.FC = () => {
                             padding: '1rem',
                             borderRadius: '8px',
                             marginBottom: '2rem',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            border: '1px solid #e0e0e0'
                         }}
                     >
-                        <h3>Clima em {weather.city}</h3>
-                        <p>Temperatura: {weather.temp}°C</p>
-                        <p>{weather.description}</p>
+                        <h3 style={{ margin: '0 0 0.5rem 0' }}>Clima em {weather.city}</h3>
+                        <p style={{ margin: '0.2rem 0' }}>Temperatura: {weather.temp}°C</p>
+                        <p style={{ margin: '0.2rem 0', color: '#666' }}>{weather.description}</p>
                     </div>
                 )}
 

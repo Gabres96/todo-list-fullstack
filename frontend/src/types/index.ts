@@ -14,9 +14,9 @@ export interface Task {
     title: string;
     description?: string;
     completed: boolean;
-    category?: number | Category;
     owner: number;
     owner_username?: string;
+    category?: number;
     shared_with: number[];
-    shared_with_details?: User[];
+    shared_with_details?: Array<{ id: number; username: string }>;
 }
