@@ -157,6 +157,23 @@ export const Dashboard: React.FC = () => {
         }
     }
 
+    async function handleShareTask(id: number, username: string) {
+        try {
+            const updatedTask = await taskService.shareTask(id, username);
+
+            setTasks((prev) =>
+                prev.map((task) =>
+                    task.id === updatedTask.id ? updatedTask : task
+                )
+            );
+
+            alert(`Tarefa compartilhada com @${username} com sucesso!`);
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.error || 'Erro ao compartilhar tarefa.';
+            alert(errorMsg);
+        }
+    }
+
     const handleSelectEditTask = (task: Task) => {
         setEditingTask(task);
     };
@@ -250,6 +267,7 @@ export const Dashboard: React.FC = () => {
                     onToggle={handleToggleTask}
                     onDelete={handleDeleteTask}
                     onEdit={handleSelectEditTask}
+                    onShare={handleShareTask}
                 />
 
                 <div style={{
