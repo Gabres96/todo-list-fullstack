@@ -66,7 +66,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onEdit, onDelete, o
     const { user } = useAuth();
     const [usernameToShare, setUsernameToShare] = useState('');
 
-    const isSharedWithMe = user && task.owner !== user.id;
+    const isSharedWithMe = !!(user?.id && task.owner && Number(task.owner) !== Number(user.id));
 
     const handleShareSubmit = () => {
         if (!usernameToShare.trim()) return;
