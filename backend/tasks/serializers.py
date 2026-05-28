@@ -10,14 +10,26 @@ class UserMinifiedSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    
     shared_with_details = UserMinifiedSerializer(source='shared_with', many=True, read_only=True)
 
-    class Meta:
-        model = Task
-        fields = '__all__'
-
-        read_only_fields = (
-            'owner',
-            'created_at',
-            'updated_at'
-        )
+    fields = ( 
+        'id',
+        'title',
+        'description', 
+        'completed', 
+        'owner', 
+        'category', 
+        'category_name', 
+        'shared_with', 
+        'shared_with_details', 
+        'created_at', 
+        'updated_at', 
+    )
+    
+    read_only_fields = (
+        'owner', 
+        'created_at', 
+        'updated_at',
+    )
