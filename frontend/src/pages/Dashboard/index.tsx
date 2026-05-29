@@ -93,25 +93,32 @@ export const Dashboard: React.FC = () => {
 
 
     async function handleCreateTask(
-        title: string,
-        description: string,
-        category?: number
-    ) {
-        try {
-            await taskService.createTask({
-                title,
-                description,
-                category,
-                completed: false,
-                shared_with: [],
-            });
+    title: string,
+    description: string,
+    category?: number
+) {
+    try {
+        await taskService.createTask({
+            title,
+            description,
+            category,
+            completed: false,
+            shared_with: [],
+        });
 
-            setCurrentPage(1);
-            fetchTasks();
-        } catch (error) {
-            console.error('Erro ao criar tarefa:', error);
-        }
+        setCurrentPage(1);
+        
+        setStatusFilter('all');
+        setCategoryFilter('all');
+
+        fetchTasks();
+        
+        alert('Tarefa criada com sucesso!');
+    } catch (error) {
+        console.error('Erro ao criar tarefa:', error);
+        alert('Erro ao criar tarefa.');
     }
+}
 
     async function handleCreateCategory(e: React.FormEvent) {
         e.preventDefault();
@@ -160,10 +167,11 @@ export const Dashboard: React.FC = () => {
     ) {
         try {
             const updatedTask =
-                await taskService.updateTask(id, {
+                await taskService.createTask({ 
                     title,
-                    description,
-                    category,
+                     description, 
+                     category, 
+                     completed: false,
                 });
 
             setTasks((prev) =>
