@@ -34,6 +34,9 @@ export const Dashboard: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
+    const [newCategoryName, setNewCategoryName] = useState<string>('');
+    const [categoryError, setCategoryError] = useState<string | null>(null);
+
     const PAGE_SIZE = 10;
 
     async function fetchTasks() {
@@ -63,19 +66,18 @@ export const Dashboard: React.FC = () => {
         try {
             setLoading(true);
 
-            const [
-                categoriesResponse,
-                weatherResponse,
-            ] = await Promise.all([
-                categoryService.getCategories(),
-                integrationService.getWeather(),
+            await Promise.all([
+                categoryService.getCategories()
+                    .then(res => setCategories(res))
+                    .catch(err => console.error('Erro ao buscar categories:', err)),
+
+                integrationService.getWeather()
+                    .then(res => setWeather(res))
+                    .catch(err => console.error('Erro ao buscar clima:', err))
             ]);
 
-            setCategories(categoriesResponse);
-            setWeather(weatherResponse);
-
         } catch (error) {
-            console.error('Erro ao carregar dados fixos do dashboard:', error);
+            console.error('Erro geral no carregamento do dashboard:', error);
         } finally {
             setLoading(false);
         }
@@ -108,6 +110,45 @@ export const Dashboard: React.FC = () => {
             fetchTasks();
         } catch (error) {
             console.error('Erro ao criar tarefa:', error);
+        }
+    }
+
+    async function handleCreateCategory(e: React.FormEvent) {
+        e.preventDefault();
+        if (!newCategoryName.trim()) return;
+
+        try {
+            setCategoryError(null); // Limpa erros antigos antes de tentar
+            const createdCategory = await categoryService.createCategory(newCategoryName.trim());
+            setCategories((prev) => [...prev, createdCategory]);
+            setNewCategoryName('');
+            alert('Categoria criada com sucesso!');
+        } catch (error: any) {
+            console.error('Erro ao criar categoria:', error);
+            if (error.response && error.response.data && error.response.data.name) {
+                setCategoryError(error.response.data.name[0]);
+            } else {
+                setCategoryError('Não foi possível criar a categoria.');
+            }
+        }
+    }
+
+    async function handleDeleteCategory(id: number) {
+        if (!window.confirm("Tem certeza que deseja excluir esta categoria? As tarefas associadas serão afetadas.")) return;
+
+        try {
+            await categoryService.deleteCategory(id);
+
+            setCategories((prev) => prev.filter(cat => cat.id !== id));
+
+            if (categoryFilter === String(id)) {
+                setCategoryFilter('all');
+            }
+
+            fetchTasks();
+        } catch (error) {
+            console.error('Erro ao deletar categoria:', error);
+            alert('Não foi possível excluir a categoria.');
         }
     }
 
@@ -180,7 +221,7 @@ export const Dashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <div style={{ padding: '2rem' }}> Carregando... </div>
+            <div style={{ padding: '2rem', color: '#333' }}> Carregando... </div>
         );
     }
 
@@ -215,7 +256,7 @@ export const Dashboard: React.FC = () => {
                     <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#333' }}>
                         Olá, <span style={{ color: '#007bff' }}>@{user?.username}</span> 👋
                     </h2>
-                    
+
                     <button
                         onClick={logout}
                         style={{
@@ -246,18 +287,110 @@ export const Dashboard: React.FC = () => {
                     <div
                         style={{
                             background: '#fff',
-                            padding: '1rem',
+                            padding: '1rem 1.5rem',
                             borderRadius: '8px',
                             marginBottom: '2rem',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                             border: '1px solid #e0e0e0'
                         }}
                     >
-                        <h3 style={{ margin: '0 0 0.5rem 0' }}>Clima em {weather.city}</h3>
-                        <p style={{ margin: '0.2rem 0' }}>Temperatura: {weather.temp}°C</p>
+                        <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Clima em {weather.city}</h3>
+                        <p style={{ margin: '0.2rem 0', color: '#222', fontWeight: 'bold' }}>Temperatura: {weather.temp}°C</p>
                         <p style={{ margin: '0.2rem 0', color: '#666' }}>{weather.description}</p>
                     </div>
                 )}
+
+                <div
+                    style={{
+                        background: '#fff',
+                        padding: '1.5rem',
+                        borderRadius: '8px',
+                        marginBottom: '2rem',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        border: '1px solid #e0e0e0'
+                    }}
+                >
+                    <h3 style={{ margin: '0 0 1rem 0', color: '#222', fontSize: '1.1rem', fontWeight: 'bold' }}>Gerenciar Categorias</h3>
+                    <form onSubmit={handleCreateCategory} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <input
+                            type="text"
+                            placeholder="Nova categoria (ex: Trabalho, Faculdade)"
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                borderRadius: '4px',
+                                border: '1px solid #ccc',
+                                fontSize: '0.9rem',
+                                color: '#333',
+                                backgroundColor: '#fff'
+                            }}
+                        />
+                        <button
+                            type="submit"
+                            style={{
+                                padding: '0.6rem 1.5rem',
+                                backgroundColor: '#28a745',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            Criar
+                        </button>
+                    </form>
+
+                    {categoryError && (
+                        <p style={{ color: '#dc3545', fontSize: '0.85rem', margin: '0 0 1rem 0', fontWeight: '500' }}>
+                            ⚠️ {categoryError}
+                        </p>
+                    )}
+
+                    <div style={{
+                        maxHeight: '150px',
+                        overflowY: 'auto',
+                        borderTop: '1px solid #eee',
+                        paddingTop: '0.5rem'
+                    }}>
+                        {categories.length === 0 ? (
+                            <p style={{ color: '#888', fontSize: '0.85rem', margin: '0.5rem 0' }}>Nenhuma categoria criada.</p>
+                        ) : (
+                            categories.map((cat) => (
+                                <div
+                                    key={cat.id}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '0.4rem 0.5rem',
+                                        borderRadius: '4px',
+                                        backgroundColor: '#f9f9f9',
+                                        margin: '4px 0'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '0.9rem', color: '#444' }}>📁 {cat.name}</span>
+                                    <button
+                                        onClick={() => handleDeleteCategory(cat.id)}
+                                        title="Excluir categoria"
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            fontSize: '0.95rem',
+                                            padding: '2px 6px'
+                                        }}
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
 
                 <TaskForm
                     categories={categories}
@@ -266,6 +399,7 @@ export const Dashboard: React.FC = () => {
                     editingTask={editingTask}
                 />
 
+                {/* SEÇÃO DE FILTROS */}
                 <div style={{
                     display: 'flex',
                     gap: '1rem',
@@ -276,11 +410,11 @@ export const Dashboard: React.FC = () => {
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                 }}>
                     <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#555' }}>Filtrar por Status</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#333' }}>Filtrar por Status</label>
                         <select
                             value={statusFilter}
                             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-                            style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                            style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc', color: '#333', backgroundColor: '#fff' }}
                         >
                             <option value="all">Todas as tarefas</option>
                             <option value="pending">Pendentes</option>
@@ -289,11 +423,11 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#555' }}>Filtrar por Categoria</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#333' }}>Filtrar por Categoria</label>
                         <select
                             value={categoryFilter}
                             onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
-                            style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                            style={{ width: '100%', padding: '0.6rem', borderRadius: '4px', border: '1px solid #ccc', color: '#333', backgroundColor: '#fff' }}
                         >
                             <option value="all">Todas as categorias</option>
                             {categories.map((cat) => (
