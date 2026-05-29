@@ -1,4 +1,3 @@
-```yaml id="f0iym9"
 name: Django CI
 
 on:
@@ -67,4 +66,3 @@ jobs:
         working-directory: backend
         run: |
           pytest -v
-```
