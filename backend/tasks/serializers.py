@@ -66,3 +66,14 @@ class TaskSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+
+    def validate_category(self, value):
+        request = self.context.get('request')
+
+        if value and value.owner != request.user:
+            raise serializers.ValidationError(
+                "Você só pode usar categorias próprias."
+            )
+
+        return value
+
