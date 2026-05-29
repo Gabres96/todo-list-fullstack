@@ -1,4 +1,16 @@
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=todo_db
+      - POSTGRES_USER=todo_user
+      - POSTGRES_PASSWORD=todo_password
+    ports:
+      - "5432:5432"
+
   backend:
     build:
       context: ./backend
@@ -10,6 +22,12 @@ services:
       - ./backend:/app
     environment:
       - DEBUG=True
+      - DB_HOST=db
+      - DB_NAME=todo_db
+      - DB_USER=todo_user
+      - DB_PASSWORD=todo_password
+    depends_on:
+      - db
 
   frontend:
     build:
@@ -25,3 +43,6 @@ services:
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
