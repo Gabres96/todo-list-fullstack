@@ -11,6 +11,5 @@ class WeatherService:
             "city_name": city_name
         }
         
-        # Faz a requisição HTTP com limite de 5 segundos
         response = requests.get(cls.BASE_URL, params=params, timeout=5)
         return response
