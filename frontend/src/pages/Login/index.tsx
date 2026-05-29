@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export const Login: React.FC = () => {
@@ -13,7 +13,7 @@ export const Login: React.FC = () => {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!username || !password) {
       setError('Preencha todos os campos');
       return;
@@ -22,9 +22,9 @@ export const Login: React.FC = () => {
     try {
       setError('');
       setLoading(true);
-      
+
       await signIn(username, password);
-      
+
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Erro ao realizar login. Verifique suas credenciais.');
@@ -35,10 +35,10 @@ export const Login: React.FC = () => {
 
   return (
     <div style={{
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh', 
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
       backgroundColor: '#f5f5f5',
       fontFamily: 'sans-serif'
     }}>
@@ -48,7 +48,7 @@ export const Login: React.FC = () => {
         borderRadius: '8px',
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
         width: '100%',
-        maxLength: '320px',
+        maxWidth: '320px',
         display: 'flex',
         flexDirection: 'column',
         gap: '1rem'
@@ -65,7 +65,13 @@ export const Login: React.FC = () => {
             value={username}
             onChange={e => setUsername(e.target.value)}
             disabled={loading}
-            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              backgroundColor: '#fff',
+              color: '#333'
+            }}
           />
         </div>
 
@@ -77,12 +83,18 @@ export const Login: React.FC = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             disabled={loading}
-            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              backgroundColor: '#fff',
+              color: '#333'
+            }}
           />
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           style={{
             padding: '0.75rem',
@@ -97,6 +109,13 @@ export const Login: React.FC = () => {
         >
           {loading ? 'Carregando...' : 'Entrar'}
         </button>
+
+        <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', color: '#666' }}>Não tem uma conta? </span>
+          <Link to="/register" style={{ fontSize: '0.875rem', color: '#007bff', textDecoration: 'none', fontWeight: 'bold' }}>
+            Cadastre-se
+          </Link>
+        </div>
       </form>
     </div>
   );
