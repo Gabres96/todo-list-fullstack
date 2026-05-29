@@ -1,0 +1,70 @@
+```yaml id="f0iym9"
+name: Django CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+      - fix/**
+      - test/**
+      - ci/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+
+        env:
+          POSTGRES_DB: todo_db
+          POSTGRES_USER: todo_user
+          POSTGRES_PASSWORD: todo_password
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd="pg_isready -U todo_user -d todo_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_NAME: todo_db
+      DB_USER: todo_user
+      DB_PASSWORD: todo_password
+      DB_HOST: localhost
+      DB_PORT: 5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        working-directory: backend
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        working-directory: backend
+        run: |
+          pytest -v
+```
