@@ -118,7 +118,7 @@ export const Dashboard: React.FC = () => {
         if (!newCategoryName.trim()) return;
 
         try {
-            setCategoryError(null); // Limpa erros antigos antes de tentar
+            setCategoryError(null);
             const createdCategory = await categoryService.createCategory(newCategoryName.trim());
             setCategories((prev) => [...prev, createdCategory]);
             setNewCategoryName('');
@@ -399,7 +399,6 @@ export const Dashboard: React.FC = () => {
                     editingTask={editingTask}
                 />
 
-                {/* SEÇÃO DE FILTROS */}
                 <div style={{
                     display: 'flex',
                     gap: '1rem',

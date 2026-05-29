@@ -61,3 +61,20 @@ class TaskViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='remove-share')
+    def remove_share(self, request, pk=None):
+        task = self.get_object()
+        
+        if request.user not in task.shared_with.all():
+            return Response(
+                {"error": "Você não faz parte desta tarefa compartilhada ou não possui permissão."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        task.shared_with.remove(request.user)
+        
+        return Response(
+            {"message": "Você saiu do compartilhamento desta tarefa com sucesso."}, 
+            status=status.HTTP_200_OK
+        )
