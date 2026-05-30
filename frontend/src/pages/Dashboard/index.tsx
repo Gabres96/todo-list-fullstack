@@ -37,7 +37,26 @@ export const Dashboard: React.FC = () => {
     const [newCategoryName, setNewCategoryName] = useState<string>('');
     const [categoryError, setCategoryError] = useState<string | null>(null);
 
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
     const PAGE_SIZE = 10;
+
+    function showSuccess(message: string) {
+        setSuccessMessage(message);
+
+        setTimeout(() => {
+            setSuccessMessage('');
+        }, 3000);
+    }
+
+    function showError(message: string) {
+        setErrorMessage(message);
+
+        setTimeout(() => {
+            setErrorMessage('');
+        }, 3000);
+    }
 
     async function fetchTasks() {
         try {
@@ -93,32 +112,32 @@ export const Dashboard: React.FC = () => {
 
 
     async function handleCreateTask(
-    title: string,
-    description: string,
-    category?: number
-) {
-    try {
-        await taskService.createTask({
-            title,
-            description,
-            category,
-            completed: false,
-            shared_with: [],
-        });
+        title: string,
+        description: string,
+        category?: number
+    ) {
+        try {
+            await taskService.createTask({
+                title,
+                description,
+                category,
+                completed: false,
+                shared_with: [],
+            });
 
-        setCurrentPage(1);
-        
-        setStatusFilter('all');
-        setCategoryFilter('all');
+            setCurrentPage(1);
 
-        fetchTasks();
-        
-        alert('Tarefa criada com sucesso!');
-    } catch (error) {
-        console.error('Erro ao criar tarefa:', error);
-        alert('Erro ao criar tarefa.');
+            setStatusFilter('all');
+            setCategoryFilter('all');
+
+            fetchTasks();
+
+            showSuccess('Tarefa criada com sucesso!');
+        } catch (error) {
+            console.error('Erro ao criar tarefa:', error);
+            showError('Erro ao criar tarefa.');
+        }
     }
-}
 
     async function handleCreateCategory(e: React.FormEvent) {
         e.preventDefault();
@@ -129,7 +148,7 @@ export const Dashboard: React.FC = () => {
             const createdCategory = await categoryService.createCategory(newCategoryName.trim());
             setCategories((prev) => [...prev, createdCategory]);
             setNewCategoryName('');
-            alert('Categoria criada com sucesso!');
+            showSuccess('Categoria criada com sucesso!');
         } catch (error: any) {
             console.error('Erro ao criar categoria:', error);
             if (error.response && error.response.data && error.response.data.name) {
@@ -155,7 +174,7 @@ export const Dashboard: React.FC = () => {
             fetchTasks();
         } catch (error) {
             console.error('Erro ao deletar categoria:', error);
-            alert('Não foi possível excluir a categoria.');
+            showError('Não foi possível excluir a categoria.');
         }
     }
 
@@ -166,13 +185,11 @@ export const Dashboard: React.FC = () => {
         category?: number
     ) {
         try {
-            const updatedTask =
-                await taskService.createTask({ 
-                    title,
-                     description, 
-                     category, 
-                     completed: false,
-                });
+            const updatedTask = await taskService.updateTask(id, {
+                title,
+                description,
+                category,
+            });
 
             setTasks((prev) =>
                 prev.map((task) =>
@@ -216,10 +233,10 @@ export const Dashboard: React.FC = () => {
                 )
             );
 
-            alert(`Tarefa compartilhada com @${username} com sucesso!`);
+            showSuccess(`Tarefa compartilhada com @${username} com sucesso!`);
         } catch (error: any) {
             const errorMsg = error.response?.data?.error || 'Erro ao compartilhar tarefa.';
-            alert(errorMsg);
+            showError(errorMsg);
         }
     }
 
@@ -242,6 +259,40 @@ export const Dashboard: React.FC = () => {
             }}
         >
             <Header />
+
+            {successMessage && (
+                <div
+                    style={{
+                        maxWidth: '900px',
+                        margin: '1rem auto 0 auto',
+                        padding: '1rem',
+                        backgroundColor: '#d4edda',
+                        color: '#155724',
+                        border: '1px solid #c3e6cb',
+                        borderRadius: '8px',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    {successMessage}
+                </div>
+            )}
+
+            {errorMessage && (
+                <div
+                    style={{
+                        maxWidth: '900px',
+                        margin: '1rem auto 0 auto',
+                        padding: '1rem',
+                        backgroundColor: '#f8d7da',
+                        color: '#721c24',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '8px',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    {errorMessage}
+                </div>
+            )}
 
             <div
                 style={{

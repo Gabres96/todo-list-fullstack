@@ -4,13 +4,14 @@ import { authService } from '../../services/authService';
 
 export const Register: React.FC = () => {
     const navigate = useNavigate();
-    
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState('');
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -24,9 +25,11 @@ export const Register: React.FC = () => {
         try {
             setLoading(true);
             await authService.register(username, email, password);
-            
-            alert('Conta criada com sucesso! Redirecionando para o login...');
+
+            setSuccess('Conta criada com sucesso!');
+
             navigate('/login');
+
         } catch (err: any) {
             console.error(err);
             const msg = err.response?.data?.username?.[0] || err.response?.data?.error || 'Erro ao criar conta. Tente outro username.';
@@ -58,6 +61,21 @@ export const Register: React.FC = () => {
                 {error && (
                     <div style={{ color: '#721c24', background: '#f8d7da', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.9rem', marginTop: '1rem' }}>
                         {error}
+                    </div>
+                )}
+
+                {success && (
+                    <div
+                        style={{
+                            color: '#155724',
+                            background: '#d4edda',
+                            padding: '0.75rem',
+                            borderRadius: '4px',
+                            marginBottom: '1rem',
+                            marginTop: '1rem'
+                        }}
+                    >
+                        {success}
                     </div>
                 )}
 
