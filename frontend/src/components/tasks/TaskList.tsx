@@ -137,7 +137,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onEdit, onDelete, o
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
                         onClick={() => onToggle(task)}
-                        style={{ padding: '0.5rem 0.8rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc', background: '#f8f9fa' }}
+                        style={{ padding: '0.5rem 0.8rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc', background: task.completed ? '#e2e3e5' : '#d4edda', color: '#155724', fontWeight: 'bold' }}
                     >
                         {task.completed ? 'Desmarcar' : 'Concluir'}
                     </button>
@@ -146,7 +146,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onEdit, onDelete, o
                         <>
                             <button
                                 onClick={() => onEdit(task)}
-                                style={{ padding: '0.5rem 0.8rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc', background: '#f8f9fa' }}
+                                style={{ padding: '0.5rem 0.8rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc', background: '#fff3cd', color: '#856404', fontWeight: 'bold' }}
                             >
                                 Editar
                             </button>
