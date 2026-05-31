@@ -16,7 +16,6 @@ A aplicação foi construída utilizando:
 - Testes Backend: Pytest
 - Testes Frontend: Selenium
 - CI/CD: GitHub Actions
-- Deploy (Extra): AWS Elastic Beanstalk
 ## ✨ Funcionalidades Implementadas
 #### 👤 Usuários
 - Cadastro de usuários
