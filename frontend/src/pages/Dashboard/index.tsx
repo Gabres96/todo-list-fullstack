@@ -215,13 +215,21 @@ export const Dashboard: React.FC = () => {
     }
 
     async function handleDeleteTask(id: number) {
-        try {
-            await taskService.deleteTask(id);
+    try {
+        await taskService.deleteTask(id);
+        
+        if (tasks.length === 1 && currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        } else {
             fetchTasks();
-        } catch (error) {
-            console.error('Erro ao deletar tarefa:', error);
         }
+        
+        showSuccess('Tarefa excluída com sucesso!');
+    } catch (error) {
+        console.error('Erro ao deletar tarefa:', error);
+        showError('Erro ao excluir tarefa.');
     }
+}
 
     async function handleShareTask(id: number, username: string) {
         try {
