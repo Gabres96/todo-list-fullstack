@@ -8,6 +8,6 @@ export const Header: React.FC = () => {
                 color: '#fff',
                 padding: '1rem 2rem',
             }}
-        > <h2>Todo App</h2> </header>
+        > <h2>Gerenciador de Tarefas</h2> </header>
     );
 };
