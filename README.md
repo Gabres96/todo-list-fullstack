@@ -7,7 +7,7 @@ O sistema permite que usuários criem contas, gerenciem tarefas, organizem taref
 ## 📌 Sobre o Projeto
 
 A aplicação foi construída utilizando:
-
+- Python
 - Frontend: React + TypeScript + Vite
 - Backend: Django + Django REST Framework
 - Banco de Dados: PostgreSQL
@@ -74,7 +74,6 @@ O projeto foi dividido em três serviços independentes:
 - Docker
 - Docker Compose
 - GitHub Actions
-- AWS Elastic Beanstalk
 ## 📥 Clonando o Projeto
 ```bash
 git clone https://github.com/Gabres96/todo-list-fullstack.git
